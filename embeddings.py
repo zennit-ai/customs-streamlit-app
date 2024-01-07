@@ -31,7 +31,7 @@ docs = process_large_jsonl_file_v4(file_path)
 openai_api_key =os.getenv("API_KEY")
 embedding = OpenAIEmbeddings(openai_api_key=openai_api_key)
 
-es_url = "http://localhost:9200" # 
+es_url = "http://localhost:9200" 
 index_name = "test_index"
 
 
