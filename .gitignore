@@ -1,0 +1,16 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore the virtual environment directory
+venv/
+
+# Ignore text editor-specific files
+.vscode/
+
+# Ignore env files 
+*.env 
+
+# Data 
+*.csv
+*.josnl
+
