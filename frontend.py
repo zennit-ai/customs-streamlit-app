@@ -62,7 +62,8 @@ if st.button("Search") and query:
             lot_id = fraction.split(".")[0]
             # Tuple lot_id and lot_text
             lot_info.add((lot_id, lot_text))
-
+        
+        st.markdown("### Posibles fracciones relacionadas:")
         for lot_id, lot_text in lot_info: # Iterate in tuple set
             st.subheader(f"Lote: {lot_text} Id de lote: {lot_id}")
             fractions_for_lot_id = [result.metadata.get('id', 'N/A') for result in results if result.metadata.get('id', 'N/A').startswith(lot_id)]
