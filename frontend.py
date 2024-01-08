@@ -9,8 +9,14 @@ from backend import llm_response
 
 load_dotenv()
 
+
+
 # Loading data frame as csv
 df = pd.read_csv("fraction.csv")
+# Higlight function 
+def id_highlight(row, lot_ids):
+    return ['background-color: #173928'] * len(row) if row['id'] in lot_ids else ['background-color: black'] * len(row)
+
 
 # Get the OpenAI API key from environment variables
 openai_api_key = os.getenv("API_KEY")
@@ -25,6 +31,24 @@ elastic_vector_search = ElasticsearchStore(
     es_url=es_url, index_name=index_name, embedding=embedding
 )
 
+# Usage message 
+with st.expander("¿Cómo funciona?"):
+        st.markdown("""
+#### Búsqueda Arancelaria
+
+Esta sección te permite buscar la fracción arancelaria y conocer su arancel de importación y exportación. 
+En el resultado, se proporciona la opción que mejor se ajusta a la búsqueda, 
+junto con recomendaciones para mejorarla en caso de que presente ambigüedades.
+
+#### Posibles Fracciones Relacionadas
+
+Si la búsqueda no arrojó los resultados esperados incluso después de haber probado las recomendaciones, 
+esta sección presenta varias opciones posibles de aranceles en las cuales puedes buscar. 
+También puedes experimentar con nuevas formas de búsqueda para obtener información más precisa y específica.
+
+[¿Tienes dudas?](https://google.com)                   
+                                        
+""")
 # Streamlit UI
 st.title("Busqueda Arancelaria")
 
@@ -53,6 +77,7 @@ if st.button("Search") and query:
     
         fractions_results = []
         # Set to store lot_id and lot_text 
+        
         lot_info = set()
         for result in results:
             # Extraction of fraction from metadata
@@ -60,8 +85,11 @@ if st.button("Search") and query:
             # Extraction of lot text from metadata
             lot_text = result.metadata.get("lot_text")
             lot_id = fraction.split(".")[0]
+        
+        
             # Tuple lot_id and lot_text
             lot_info.add((lot_id, lot_text))
+        
         
         st.markdown("### Posibles fracciones relacionadas:")
         for lot_id, lot_text in lot_info: # Iterate in tuple set
@@ -80,22 +108,15 @@ if st.button("Search") and query:
                 # Highlighting fraction results
                 
         
-                st.dataframe(filtered_df)
+                #st.dataframe(filtered_df)
+                st.dataframe(filtered_df.style.apply(id_highlight, lot_ids=fractions_for_lot_id, axis=1))
             else:
                 st.warning(f"No fractions found for Lot id {lot_id}.")
 
     else:
         st.warning("No results found.")
-# Loaders 
-# NOM  con base a ley 
-# Span
-# Title 
-# Subtitles separados | Rec and similars 
-# Color minimal 
-# Highlights in df 
-# search bar grande 
-# Title principal petite 
-# Zennt property 
+
+# Based on lot_id higlight each lot_id values for the data frame displayed
 
                                   
 
