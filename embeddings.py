@@ -63,7 +63,3 @@ db = ElasticsearchStore(
 )
 
 
-# Problem description: 
-# when a samller jsonl is provided in the file_path no error is generated
-# when the size of the file is increased an token error is generated 
-# posible solution: implement chunks
