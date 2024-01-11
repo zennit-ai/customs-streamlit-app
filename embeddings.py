@@ -1,7 +1,8 @@
 import json
 import time
+import tiktoken 
 from langchain.vectorstores.elasticsearch import ElasticsearchStore
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain.docstore.document import Document
 from dotenv import load_dotenv
 
@@ -29,37 +30,19 @@ file_path = 'fractions_denormalized_enhanced.jsonl'
 docs = process_large_jsonl_file_v4(file_path)
 
 # Set up Elasticsearch
-openai_api_key =os.getenv("API_KEY")
-embedding = OpenAIEmbeddings(openai_api_key=openai_api_key)
 
-es_url = "http://localhost:9200" # 
+file_path = 'fractions_denormalized_enhanced.jsonl'
+docs = process_large_jsonl_file_v4(file_path)
+openai_api_key = "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"
+embedding = OpenAIEmbeddings(model="text-embedding-ada-002",openai_api_key=openai_api_key)
+es_url = "http://localhost:9200/"#PORFAS!
 index_name = "test_index"
 
-
-
-# Create ElasticsearchStore from documents
-# Acordarse de poner sleep 
-ElasticsearchStore.from_documents(
-    docs[:len(docs)//2],
+db = ElasticsearchStore.from_documents(
+    docs,
     embedding,
     es_url=es_url,
     index_name="test",
-    strategy=ElasticsearchStore.ApproxRetrievalStrategy()
+    strategy=ElasticsearchStore.ApproxRetrievalStrategy(),
 )
-time.sleep(40)
-
-ElasticsearchStore.from_documents(
-    docs[len(docs)//2:],
-    embedding,
-    es_url=es_url,
-    index_name="test",
-    strategy=ElasticsearchStore.ApproxRetrievalStrategy()
-)
-
-db = ElasticsearchStore(
-    embedding=embedding,
-    es_url=es_url,
-    index_name="test"
-)
-
-
+db.client.indices.refresh(index="test")

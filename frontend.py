@@ -26,7 +26,7 @@ embedding = OpenAIEmbeddings(api_key=openai_api_key)
 
 # Create an instance of the ElasticsearchStore class
 es_url = "http://localhost:9200"
-index_name = "test"
+index_name = "tpm"
 elastic_vector_search = ElasticsearchStore(
     es_url=es_url, index_name=index_name, embedding=embedding
 )
@@ -53,7 +53,7 @@ También puedes experimentar con nuevas formas de búsqueda para obtener informa
 st.title("Busqueda Arancelaria")
 
 # User input for search query
-query = st.text_input("Enter your search query:")
+query = st.text_input("Ingrese su arancel a buscar:")
 
 # Number of results to display
 k = 7
@@ -71,7 +71,7 @@ if st.button("Search") and query:
     # Display search results
     st.markdown("### Reslutado de búsqueda:")
     if results:
-        with st.spinner("Aguarda, el LLM anda chambeando un vergo"):
+        with st.spinner("Porfavor espere"):
             response = llm_response(results, query)
             st.success(response)
     

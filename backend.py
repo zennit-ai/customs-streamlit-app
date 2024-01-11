@@ -1,7 +1,7 @@
 
 # LLM integration 
 from langchain.prompts import PromptTemplate
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import OpenAI
 from dotenv import load_dotenv
 import os 
 import re 
@@ -73,7 +73,7 @@ Opciones de arancel: [{results_string}]
 """
     )
 
-    model = ChatOpenAI(openai_api_key=openai_api_key, temperature=0, model_name='gpt-4')
+    model = OpenAI(api_key="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", temperature=0, model='gpt-3.5-turbo-instruct')# usar gpt4
     chain = prompt | model
     answer=chain.invoke({'user_query':query,'results_string':results_string})
     answer_content = answer.content
