@@ -1,6 +1,4 @@
 import json
-import time
-import tiktoken 
 from langchain.vectorstores.elasticsearch import ElasticsearchStore
 from langchain_openai import OpenAIEmbeddings
 from langchain.docstore.document import Document
@@ -11,38 +9,53 @@ import os
 
 load_dotenv()
 
-# Load your JSONL file and create a list of Document objects
-def process_jsonl_line_v4(line):
-    item = json.loads(line)
-    page_content = ' '.join([v for k, v in item.items() if k.endswith('_text')])
-    metadata = item
-    return Document(page_content=page_content, metadata=metadata)
 
 def process_large_jsonl_file_v4(file_path):
     docs = []
     with open(file_path, 'r', encoding='utf-8') as file:
         for line in file:
-            document = process_jsonl_line_v4(line)
+            item = json.loads(line)
+            # Rearranging the order of text as specified
+            page_content = '{}. -> {} -> {} -> {}'.format(
+                item.get('chapter_text', ''),
+                item.get('lot_text', ''),
+                item.get('subcategory_text', ''),
+                item.get('fraction_text', '')
+            )
+            metadata = item
+            document = Document(page_content=page_content, metadata=metadata)
             docs.append(document)
     return docs
 
-file_path = 'fractions_denormalized_enhanced.jsonl'  
+file_path = 'fractions_denormalized_enhanced.json'  
 docs = process_large_jsonl_file_v4(file_path)
+docs_for_embedding = [doc.page_content for doc in docs]
 
 # Set up Elasticsearch
 
-file_path = 'fractions_denormalized_enhanced.jsonl'
-docs = process_large_jsonl_file_v4(file_path)
-openai_api_key = os.getenv("API_KEY")
+openai_api_key = os.getenv("OPENAI_KEY")
 embedding = OpenAIEmbeddings(model="text-embedding-ada-002",openai_api_key=openai_api_key)
-es_url = "https://bbf9-177-227-57-18.ngrok-free.app/"#PORFAS!
-index_name = "test_index"
+es_url = "http://localhost:9200/" 
+index_name = "test"
 
-db = ElasticsearchStore.from_documents(
-    docs,
-    embedding,
-    es_url=es_url,
-    index_name="test",
-    strategy=ElasticsearchStore.ApproxRetrievalStrategy(),
-)
+
+db = ElasticsearchStore(
+            es_url="http://localhost:9200",
+            index_name="test",
+            embedding=embedding,
+            strategy=ElasticsearchStore.ApproxRetrievalStrategy(),
+            distance_strategy="COSINE"
+        )
+
+# Loading Embeddings from non existing image
+# 
+# db = ElasticsearchStore.from_documents(
+#     docs,
+#     embedding,
+#     es_url=es_url,
+#     index_name="test",
+#     strategy=ElasticsearchStore.ApproxRetrievalStrategy(),
+#     distance_strategy="COSINE"
+# )
+
 db.client.indices.refresh(index="test")
