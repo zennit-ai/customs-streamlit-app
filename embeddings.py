@@ -33,9 +33,9 @@ docs = process_large_jsonl_file_v4(file_path)
 
 file_path = 'fractions_denormalized_enhanced.jsonl'
 docs = process_large_jsonl_file_v4(file_path)
-openai_api_key = "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"
+openai_api_key = os.getenv("API_KEY")
 embedding = OpenAIEmbeddings(model="text-embedding-ada-002",openai_api_key=openai_api_key)
-es_url = "http://localhost:9200/"#PORFAS!
+es_url = "https://bbf9-177-227-57-18.ngrok-free.app/"#PORFAS!
 index_name = "test_index"
 
 db = ElasticsearchStore.from_documents(

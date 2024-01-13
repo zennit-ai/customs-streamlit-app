@@ -26,7 +26,7 @@ embedding = OpenAIEmbeddings(api_key=openai_api_key)
 
 # Create an instance of the ElasticsearchStore class
 es_url = "http://localhost:9200"
-index_name = "tpm"
+index_name = "test"
 elastic_vector_search = ElasticsearchStore(
     es_url=es_url, index_name=index_name, embedding=embedding
 )

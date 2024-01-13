@@ -1,14 +1,16 @@
 
-# LLM integration 
+# LLM integration
 from langchain.prompts import PromptTemplate
 from langchain_openai import OpenAI
-from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 import os 
-import re 
+from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
 openai_api_key = os.getenv("API_KEY")
+print(openai_api_key)
 
 def replace_fractions(text, fractions_dict):
     # Buscar fracciones en el texto (formato nnnn.nn.nn)
@@ -25,11 +27,11 @@ def replace_fractions(text, fractions_dict):
 
 
 
-# LLM integration 
+# LLM integration
 def llm_response(results, query):
-    shown_results = []  
+    shown_results = []
     results_string = ""
-    fractions_dict = {}  
+    fractions_dict = {}
 
     # Pasando resultados a formato para LLM
     for i, result in enumerate(results):
@@ -73,9 +75,8 @@ Opciones de arancel: [{results_string}]
 """
     )
 
-    model = OpenAI(api_key="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", temperature=0, model='gpt-3.5-turbo-instruct')# usar gpt4
+    model = ChatOpenAI(api_key=openai_api_key, temperature=0, model='gpt-4')# usar gpt4
     chain = prompt | model
     answer=chain.invoke({'user_query':query,'results_string':results_string})
     answer_content = answer.content
     return replace_fractions(answer_content, fractions_dict)
-
